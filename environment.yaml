@@ -1,16 +1,22 @@
-name: gym-duckietown
+name: secondGym
 channels:
     - pytorch
     - defaults
+    - conda-forge
 dependencies:
-    - python=3.6
-    - pytorch=0.3
+    - python=3.8
+    - pytorch
     - torchvision
     - pyzmq
-    - numpy
-    - pyyaml=3.12
+    - numpy=1.21.2
+    - pyyaml
+    - pandas
+    - pip
     - pip:
-        - gym
-        - pyglet
+        - gym==0.25.1
+        - pyglet==1.5.11
         - opencv-python
         - scikit-image
+        - marshmallow
+        - marshmallow-enum
+        - typing-inspect
