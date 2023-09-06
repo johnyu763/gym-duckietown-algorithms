@@ -360,3 +360,9 @@ conda install -c conda-forge ffmpeg
 ```
 
 Alternatively, screencasting programs such as [Kazam](https://launchpad.net/kazam) can be used to record the graphical output of a single window.
+
+### Setup Instructions (Non-Docker)
+
+1. Install Anaconda
+2. Inside of gym-duckietown-algorithms directory, run conda env create -f environment.yaml
+3. Run /home/user/anaconda3/env/<your-env-name>/bin/pip install -e .

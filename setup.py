@@ -24,9 +24,9 @@ version = get_version(filename="src/gym_duckietown/__init__.py")
 line = "daffy"
 
 install_requires = [
-    "gym>=0.17.1",
+    "gym<=0.25.1",
     "numpy>=1.10.0,<=1.20.0",
-    "pyglet",
+    "pyglet==1.5.11",
     # 'pyglet',
     "pyzmq>=16.0.0",
     "opencv-python>=3.4",
@@ -37,6 +37,7 @@ install_requires = [
     "zuper-commons-z6",
     "typing_extensions",
     "Pillow",
+    "scikit-image",
 ]
 
 system_version = tuple(sys.version_info)[:3]

@@ -32,7 +32,7 @@ def _train(args):
     env = ActionWrapper(env)
     env = DtRewardWrapper(env)
     print("Initialized Wrappers")
-
+    env.render()
     # Set seeds
     seed(args.seed)
 
