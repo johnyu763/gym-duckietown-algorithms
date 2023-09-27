@@ -254,7 +254,7 @@ def main():
     env = launch_env()
     obs = env.reset()
     env.render()
-        model =  SimpleViT(
+    model =  SimpleViT(
         image_size = 144,
         patch_size = 16,
         num_classes = 2,
@@ -281,7 +281,7 @@ def main():
     f = open(file_path, "w")
     f.write("reward\tsteps\tprogress\ttrace\n")
 
-     print_interval = 1
+    print_interval = 1
     score = 0.0
     global_step = 0
     best_score = float("-inf")
@@ -289,8 +289,8 @@ def main():
     for n_epi in range(250):
         print(f"n_episode: {n_epi}")
         env.world.set_seed(47)
-        observation = env.reset();
-        observation = grab_and_preprocess_obs(observation, env, device)
+        obs = env.reset();
+        obs = grab_and_preprocess_obs(obs, env, device)
         done = False
         total_progress = 0.0
         steps = 0
