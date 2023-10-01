@@ -288,7 +288,7 @@ def main():
  
     for n_epi in range(250):
         print(f"n_episode: {n_epi}")
-        env.world.set_seed(47)
+        # env.world.set_seed(47) # is this necessary?
         obs = env.reset();
         obs = grab_and_preprocess_obs(obs, env, device)
         done = False

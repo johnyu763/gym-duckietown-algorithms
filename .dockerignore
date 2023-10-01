@@ -1,6 +1,8 @@
 **
+!runTraining.sh
 !src/**
 !experiments/**
+!learning/**
 !docker/**
 !**/*py
 !**/*yaml

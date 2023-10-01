@@ -85,6 +85,7 @@ def _train(args):
             done = False
             episode_reward = 0
             episode_num += 1
+            # episode_timesteps = 0
 
         # Select action randomly or according to policy
         if total_timesteps < args.start_timesteps:
@@ -98,7 +99,8 @@ def _train(args):
 
         # Perform action
         new_obs, reward, done, _ = env.step(action)
-
+        print("I AM TAKING AN ACTION")
+        env.render()
         if episode_timesteps >= args.env_timesteps:
             done = True
 

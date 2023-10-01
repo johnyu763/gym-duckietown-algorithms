@@ -16,11 +16,11 @@ sys.path.insert(1, '../learning/models/')
 import mycnn
 import datetime
 
-import vista
-from vista.entities.sensors.camera_utils.ViewSynthesis import DepthModes
-from vista.utils import logging, misc
-from vista.tasks import MultiAgentBase
-from vista.utils import transform
+# import vista
+# from vista.entities.sensors.camera_utils.ViewSynthesis import DepthModes
+# from vista.utils import logging, misc
+# from vista.tasks import MultiAgentBase
+# from vista.utils import transform
 
 # ### Agent Memory ###
 class Memory:

@@ -27,7 +27,8 @@ WORKDIR /gym-duckietown
 COPY . .
 RUN pip install --no-cache-dir -e . && python3 -m pip \
 install --no-cache-dir pyglet==1.5.11 gym==0.25.1 \
-scikit-image torch torchvision pillow scipy pandas 
+scikit-image torch torchvision pillow scipy pandas \
+stable-baselines3 numpy==1.21.6 'shimmy>=0.2.1'
 
 FROM base AS final
 COPY . .
