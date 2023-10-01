@@ -25,7 +25,9 @@ line = "daffy"
 
 install_requires = [
     "gym<=0.25.1",
-    "numpy>=1.10.0,<=1.20.0",
+    "stable-baselines3",
+    "numpy==1.21.6",
+    "shimmy>=0.2.1",
     "pyglet==1.5.11",
     # 'pyglet',
     "pyzmq>=16.0.0",
