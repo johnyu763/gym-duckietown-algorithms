@@ -9,7 +9,6 @@ import numpy as np
 # from reinforcement.pytorch.ddpg import DDPG
 from reinforcement.pytorch.utils import seed, evaluate_policy, ReplayBuffer
 from utils.env import launch_env
-from utils.wrappers import NormalizeWrapper, ImgWrapper, DtRewardWrapper, ActionWrapper, ResizeWrapper
 from stable_baselines3 import PPO
 from stable_baselines3.ppo.policies import CnnPolicy, MlpPolicy
 
@@ -101,7 +100,7 @@ logger.setLevel(logging.DEBUG)
 
 from stable_baselines3.common.base_class import BaseAlgorithm
 from stable_baselines3.common.evaluation import evaluate_policy
-
+from stable_baselines3.common.env_checker import check_env
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -136,33 +135,30 @@ if __name__ == "__main__":
     print("Initialized environment")
 
     # Wrappers
-    env = ResizeWrapper(env)
-    env = NormalizeWrapper(env)
-    env = ImgWrapper(env)  # to make the images from 160x120x3 into 3x160x120
-    env = ActionWrapper(env)
-    env = DtRewardWrapper(env)
-    print("Initialized Wrappers")
-    # env.render()
-    # Set seeds
-    seed(args.seed)
+    check_env(env)
 
-    # state_dim = env.observation_space.shape
-    # action_dim = env.action_space.shape[0]
-    # max_action = float(env.action_space.high[0])
+    # print("Initialized Wrappers")
+    # # env.render()
+    # # Set seeds
+    # seed(args.seed)
 
-    # Initialize policy
-    model = PPO(MlpPolicy, env, verbose=2)
-    # replay_buffer = ReplayBuffer(args.replay_buffer_max_size)
-    print("Initialized PPO Stable Baseline")
+    # # state_dim = env.observation_space.shape
+    # # action_dim = env.action_space.shape[0]
+    # # max_action = float(env.action_space.high[0])
 
-    # Evaluate untrained policy
-    print("ABOUT TO EVALUATE POLICY")
-    mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=100, warn=False)
-    print("FINISHED EVALUATING POLICY")
-    print(f"mean_reward: {mean_reward:.2f} +/- {std_reward:.2f}")
+    # # Initialize policy
+    # model = PPO(MlpPolicy, env, verbose=2)
+    # # replay_buffer = ReplayBuffer(args.replay_buffer_max_size)
+    # print("Initialized PPO Stable Baseline")
 
-    model.learn(total_timesteps=args.total_timesteps)
-    mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=100)
+    # # Evaluate untrained policy
+    # print("ABOUT TO EVALUATE POLICY")
+    # mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=100, warn=False)
+    # print("FINISHED EVALUATING POLICY")
+    # print(f"mean_reward: {mean_reward:.2f} +/- {std_reward:.2f}")
 
-    print(f"mean_reward after:{mean_reward:.2f} +/- {std_reward:.2f}")
-    model.save("{}/{}".format(args.model_dir, "ppo_duckie"))
+    # model.learn(total_timesteps=args.total_timesteps)
+    # mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=100)
+
+    # print(f"mean_reward after:{mean_reward:.2f} +/- {std_reward:.2f}")
+    # model.save("{}/{}".format(args.model_dir, "ppo_duckie"))

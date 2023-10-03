@@ -1,6 +1,6 @@
 import gym
 import gym_duckietown
-
+from .wrappers import NormalizeWrapper, ImgWrapper, DtRewardWrapper, ActionWrapper, ResizeWrapper
 
 def launch_env(id=None):
     env = None
@@ -21,5 +21,11 @@ def launch_env(id=None):
         )
     else:
         env = gym.make(id)
-
+    
+    env = ResizeWrapper(env)
+    env = NormalizeWrapper(env)
+    env = ImgWrapper(env)  # to make the images from 160x120x3 into 3x160x120
+    env = ActionWrapper(env)
+    env = DtRewardWrapper(env)
+    
     return env
