@@ -137,28 +137,29 @@ if __name__ == "__main__":
     # Wrappers
     check_env(env)
 
-    # print("Initialized Wrappers")
-    # # env.render()
-    # # Set seeds
-    # seed(args.seed)
+    print("Initialized Wrappers")
+    # env.render()
+    # Set seeds
+    seed(args.seed)
 
-    # # state_dim = env.observation_space.shape
-    # # action_dim = env.action_space.shape[0]
-    # # max_action = float(env.action_space.high[0])
+    # state_dim = env.observation_space.shape
+    # action_dim = env.action_space.shape[0]
+    # max_action = float(env.action_space.high[0])
 
-    # # Initialize policy
-    # model = PPO(MlpPolicy, env, verbose=2)
-    # # replay_buffer = ReplayBuffer(args.replay_buffer_max_size)
-    # print("Initialized PPO Stable Baseline")
+    # Initialize policy
+    model = PPO(MlpPolicy, env, verbose=2)
+    # replay_buffer = ReplayBuffer(args.replay_buffer_max_size)
+    print("Initialized PPO Stable Baseline")
 
-    # # Evaluate untrained policy
-    # print("ABOUT TO EVALUATE POLICY")
-    # mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=100, warn=False)
-    # print("FINISHED EVALUATING POLICY")
-    # print(f"mean_reward: {mean_reward:.2f} +/- {std_reward:.2f}")
+    # Evaluate untrained policy
+    print("ABOUT TO EVALUATE POLICY")
+    mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=1, warn=False)
+    for i in range(1000):
+      print("FINISHED EVALUATING POLICY")
+    print(f"mean_reward: {mean_reward:.2f} +/- {std_reward:.2f}")
 
-    # model.learn(total_timesteps=args.total_timesteps)
-    # mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=100)
+    model.learn(total_timesteps=args.max_timesteps)
+    mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=1)
 
-    # print(f"mean_reward after:{mean_reward:.2f} +/- {std_reward:.2f}")
-    # model.save("{}/{}".format(args.model_dir, "ppo_duckie"))
+    print(f"mean_reward after:{mean_reward:.2f} +/- {std_reward:.2f}")
+    model.save("{}/{}".format(args.model_dir, "ppo_duckie"))

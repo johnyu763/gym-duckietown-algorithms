@@ -6,10 +6,10 @@ def launch_env(id=None):
     env = None
     if id is None:
         # Launch the environment
-        from gym_duckietown.simulator import Simulator
+        from gym_duckietown.envs.multimap_env import MultiMapEnv
 
         env = Simulator(
-            seed=123,  # random seed
+            seed=47,  # random seed
             map_name="loop_empty",
             max_steps=500001,  # we don't want the gym to reset itself
             domain_rand=False,
@@ -22,10 +22,10 @@ def launch_env(id=None):
     else:
         env = gym.make(id)
     
-    # env = ResizeWrapper(env)
-    # env = NormalizeWrapper(env)
-    # env = ImgWrapper(env)  # to make the images from 160x120x3 into 3x160x120
-    # env = ActionWrapper(env)
-    # env = DtRewardWrapper(env)
+    env = ResizeWrapper(env)
+    env = NormalizeWrapper(env)
+    env = ImgWrapper(env)  # to make the images from 160x120x3 into 3x160x120
+    env = ActionWrapper(env)
+    env = DtRewardWrapper(env)
     
     return env

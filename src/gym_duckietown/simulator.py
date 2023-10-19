@@ -315,18 +315,9 @@ class Simulator(gym.Env):
         # We observe an RGB image with pixels in [0, 255]
         # Note: the pixels are in uint8 format because this is more compact
         # than float32 if sent over the network or stored in a dataset
-        self.observation_space = spaces.Dict(
-            {"observation": spaces.Box(low=0, high=255, shape=(self.camera_height, self.camera_width, 3), dtype=np.uint8),
-            "desired_goal": spaces.Box(low=0, high=255),
-            "achieved_goal": spaces.Box(low=0, high=255)}
+        self.observation_space = spaces.Box(
+            low=0, high=255, shape=(self.camera_height, self.camera_width, 3), dtype=np.uint8
         )
-
-        # spaces.Dict(
-        #     spaces={
-        #         "vec": spaces.Box(0, 1, (self.vector_size,), dtype=np.float64),
-        #         "img": spaces.Box(0, 255, self.img_size, dtype=np.uint8),
-        #     }
-        # )
 
         self.reward_range = (-1000, 1000)
 
@@ -343,7 +334,7 @@ class Simulator(gym.Env):
         self.multi_fbo, self.final_fbo = create_frame_buffers(self.camera_width, self.camera_height, 4)
 
         # Array to render the image into (for observation rendering)
-        self.img_array = np.zeros(shape=self.observation_space["observation"].shape, dtype=np.uint8)
+        self.img_array = np.zeros(shape=self.observation_space.shape, dtype=np.uint8)
 
         # Create a frame buffer object for human rendering
         self.multi_fbo_human, self.final_fbo_human = create_frame_buffers(WINDOW_WIDTH, WINDOW_HEIGHT, 4)
@@ -769,7 +760,7 @@ class Simulator(gym.Env):
         obs = self.render_obs(segment=segment)
 
         # Return first observation
-        return obs, {}
+        return (obs, dict())
 
     def _load_map(self, map_name: str):
         """
@@ -1566,7 +1557,6 @@ class Simulator(gym.Env):
 
         # Update the robot's position
         self.cur_pos, self.cur_angle = _update_pos(self, action)
-
         self.step_count += 1
         self.timestamp += delta_time
 
@@ -1660,12 +1650,8 @@ class Simulator(gym.Env):
         gz = GH * tile_size - cp[1]
         return [gx, gy, gz], angle
 
-    # def compute_reward(self, pos, angle, speed):
-    def compute_reward(self, achieved_goal, desired_goal, info):
+    def get_reward(self, pos, angle, speed):
         # Compute the collision avoidance penalty
-        pos, angle, speed = info["pos"],info["angle"],info["speed"]
-        print("I AM GETTING TYPE OF COL_PENALTY")
-        print(type(self.proximity_penalty2(pos, angle)))
         col_penalty = self.proximity_penalty2(pos, angle)
 
         # Get the position relative to the right lane tangent
@@ -1687,9 +1673,7 @@ class Simulator(gym.Env):
             self.update_physics(action)
 
         # Generate the current camera image
-        obs = {"observation" : self.render_obs(),
-              "desired_goal": spaces.Box(low=0, high=255),
-              "achieved_goal": spaces.Box(low=0, high=255)}
+        obs = self.render_obs()
         misc = self.get_agent_info()
 
         d = self._compute_done_reward()
@@ -1714,8 +1698,7 @@ class Simulator(gym.Env):
             done_code = "max-steps-reached"
         else:
             done = False
-            compute_reward_info = {"pos" : self.cur_pos, "angle" : self.cur_angle, "speed" : self.robot_speed}
-            reward = self.compute_reward(self.observation_space["achieved_goal"], self.observation_space["desired_goal"], compute_reward_info)
+            reward = self.get_reward(self.cur_pos, self.cur_angle, self.robot_speed)
             msg = ""
             done_code = "in-progress"
         return DoneRewardInfo(done=done, done_why=msg, reward=reward, done_code=done_code)
@@ -2073,8 +2056,7 @@ def get_dir_vec(cur_angle: float) -> np.ndarray:
     """
     Vector pointing in the direction the agent is looking
     """
-    print("TYPE OF CUR_ANGLE", type(cur_angle))
-    print("TYPE OF THING IS", type(math.cos(cur_angle)))
+
     x = math.cos(cur_angle)
     z = -math.sin(cur_angle)
     return np.array([x, 0, z])

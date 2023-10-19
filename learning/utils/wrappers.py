@@ -40,14 +40,14 @@ class ResizeWrapper(gym.ObservationWrapper):
     def __init__(self, env=None, shape=(120, 160, 3)):
         super(ResizeWrapper, self).__init__(env)
         #self.observation_space.shape = shape
-        self.observation_space = spaces.Dict(
-          {"img" : spaces.Box(
-            self.observation_space["observation"].low[0, 0, 0],
-            self.observation_space["observation"].high[0, 0, 0],
+
+        self.observation_space = spaces.Box(
+            self.observation_space.low[0, 0, 0],
+            self.observation_space.high[0, 0, 0],
             shape,
-            dtype=self.observation_space["observation"].dtype,
-          )}
+            dtype=self.observation_space.dtype,
         )
+ 
         self.shape = shape
 
     def observation(self, observation):
@@ -59,10 +59,10 @@ class ResizeWrapper(gym.ObservationWrapper):
 class NormalizeWrapper(gym.ObservationWrapper):
     def __init__(self, env=None):
         super(NormalizeWrapper, self).__init__(env)
-        self.obs_lo = self.observation_space["observation"].low[0, 0, 0]
-        self.obs_hi = self.observation_space["observation"].high[0, 0, 0]
-        obs_shape = self.observation_space["observation"].shape
-        self.observation_space = spaces.Box(0.0, 1.0, obs_shape, dtype=np.float32)
+        self.obs_lo = self.observation_space.low[0, 0, 0]
+        self.obs_hi = self.observation_space.high[0, 0, 0]
+        obs_shape = self.observation_space.shape
+        self.observation_space = spaces.Box(0.0, 1.0, obs_shape, dtype=np.float64)
 
     def observation(self, obs):
         if self.obs_lo == 0.0 and self.obs_hi == 1.0:
