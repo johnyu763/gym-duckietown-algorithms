@@ -253,6 +253,7 @@ class Simulator(gym.Env):
         :param style: String that represent which tiles will be loaded. One of ["photos", "synthetic"]
         :param enable_leds: Enables LEDs drawing.
         """
+        self.render_mode = "rgb_array"
         self.enable_leds = enable_leds
         information = get_graphics_information()
         logger.info(
@@ -376,6 +377,7 @@ class Simulator(gym.Env):
                 _map for _map in self.map_names if not _map.startswith(("calibration", "regress"))
             ]
             self.map_names = [mapfile.replace(".yaml", "") for mapfile in self.map_names]
+            print(f"MY MAP NAMES ARE {self.map_names}")
 
         # Initialize the state
         self.reset()
@@ -530,7 +532,7 @@ class Simulator(gym.Env):
         Reset the simulation at the start of a new episode
         This also randomizes many environment parameters (domain randomization)
         """
-
+        print("Resetting Duckietown Environment")
         # Step count since episode start
         self.step_count = 0
         self.timestamp = 0.0
@@ -1660,8 +1662,8 @@ class Simulator(gym.Env):
         except NotInLane:
             reward = 40 * col_penalty
         else:
-
             # Compute the reward
+            # print(f"Speed: {speed} Dot_Dir: {lp.dot_dir} Lp_Dist: {lp.dist} Col_Penalty: {col_penalty}")
             reward = +1.0 * speed * lp.dot_dir + -10 * np.abs(lp.dist) + +40 * col_penalty
         return reward
 
@@ -1678,7 +1680,7 @@ class Simulator(gym.Env):
 
         d = self._compute_done_reward()
         misc["Simulator"]["msg"] = d.done_why
-
+        # print(f"Step Count: {self.step_count} Reward: {d.reward}")
         return obs, d.reward, d.done, False, misc
 
     def _compute_done_reward(self) -> DoneRewardInfo:

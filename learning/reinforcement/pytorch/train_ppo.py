@@ -111,7 +111,7 @@ if __name__ == "__main__":
         "--start_timesteps", default=1e4, type=int
     )  # How many time steps purely random policy is run for
     parser.add_argument("--eval_freq", default=5e3, type=float)  # How often (time steps) we evaluate
-    parser.add_argument("--max_timesteps", default=1e4, type=float)  # Max time steps to run environment for
+    parser.add_argument("--max_timesteps", default=1e5, type=float)  # Max time steps to run environment for
     parser.add_argument("--save_models", action="store_true", default=True)  # Whether or not models are saved
     parser.add_argument("--expl_noise", default=0.1, type=float)  # Std of Gaussian exploration noise
     parser.add_argument("--batch_size", default=32, type=int)  # Batch size for both actor and critic
@@ -126,11 +126,10 @@ if __name__ == "__main__":
     parser.add_argument(
         "--replay_buffer_max_size", default=10000, type=int
     )  # Maximum number of steps to keep in the replay buffer
-    parser.add_argument("--model-dir", type=str, default="reinforcement/pytorch/models/")
-
-    # _train(parser.parse_args())
+    parser.add_argument("--model_dir", type=str, default="reinforcement/pytorch/models/")
+    parser.add_argument("--model_file", type=str, default="ppo_duckie")
     args = parser.parse_args()
-
+    # Create the vectorized environment
     env = launch_env()
     print("Initialized environment")
 
@@ -153,13 +152,17 @@ if __name__ == "__main__":
 
     # Evaluate untrained policy
     print("ABOUT TO EVALUATE POLICY")
-    mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=1, warn=False)
-    for i in range(1000):
-      print("FINISHED EVALUATING POLICY")
+    mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=1,warn=True)
     print(f"mean_reward: {mean_reward:.2f} +/- {std_reward:.2f}")
 
-    model.learn(total_timesteps=args.max_timesteps)
+    model.learn(total_timesteps=args.max_timesteps, progress_bar=True)
+
+    # obs = vec_env.reset()
+    # while True:
+    #     action, _states = model.predict(obs, deterministic=False)
+    #     obs, rewards, dones, info = vec_env.step(action)
+    #     vec_env.render("human")
     mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=1)
 
     print(f"mean_reward after:{mean_reward:.2f} +/- {std_reward:.2f}")
-    model.save("{}/{}".format(args.model_dir, "ppo_duckie"))
+    model.save("{}/{}".format(args.model_dir, args.model_file))
