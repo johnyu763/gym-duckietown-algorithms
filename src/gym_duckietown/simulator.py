@@ -377,7 +377,7 @@ class Simulator(gym.Env):
                 _map for _map in self.map_names if not _map.startswith(("calibration", "regress"))
             ]
             self.map_names = [mapfile.replace(".yaml", "") for mapfile in self.map_names]
-            print(f"MY MAP NAMES ARE {self.map_names}")
+            logger.info(f"MY MAP NAMES ARE {self.map_names}")
 
         # Initialize the state
         self.reset()
@@ -1663,8 +1663,10 @@ class Simulator(gym.Env):
             reward = 40 * col_penalty
         else:
             # Compute the reward
-            # print(f"Speed: {speed} Dot_Dir: {lp.dot_dir} Lp_Dist: {lp.dist} Col_Penalty: {col_penalty}")
+            # print(f"Speed: {speed} Dot: {lp.dot_dir} Angle: {lp.angle_rad} Lp_Dist: {lp.dist} Col_Penalty: {col_penalty}")
+            # reward = +1.0 * speed * lp.dot_dir + -10 * np.abs(lp.dist) + +40 * col_penalty - 5 * (1 - np.abs(lp.dot_dir))
             reward = +1.0 * speed * lp.dot_dir + -10 * np.abs(lp.dist) + +40 * col_penalty
+        # print(f"reward before: {reward}")
         return reward
 
     def step(self, action: np.ndarray):
@@ -1700,7 +1702,7 @@ class Simulator(gym.Env):
             done_code = "max-steps-reached"
         else:
             done = False
-            reward = self.get_reward(self.cur_pos, self.cur_angle, self.robot_speed)
+            reward = self.get_reward(self.cur_pos, self.cur_angle, self.speed)
             msg = ""
             done_code = "in-progress"
         return DoneRewardInfo(done=done, done_why=msg, reward=reward, done_code=done_code)

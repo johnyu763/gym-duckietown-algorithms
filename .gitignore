@@ -2,7 +2,7 @@
 *.pyc
 *.egg-info
 .idea/
-
+*zip
 xvfb.log
 bin
 

@@ -101,6 +101,7 @@ logger.setLevel(logging.DEBUG)
 from stable_baselines3.common.base_class import BaseAlgorithm
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.env_checker import check_env
+from utils.wrappers import NormalizeWrapper, ImgWrapper, DtRewardWrapper, ActionWrapper, ResizeWrapper
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -127,11 +128,16 @@ if __name__ == "__main__":
         "--replay_buffer_max_size", default=10000, type=int
     )  # Maximum number of steps to keep in the replay buffer
     parser.add_argument("--model-dir", type=str, default="reinforcement/pytorch/models/")
-
+    parser.add_argument("--model_file", type=str, default="ppo_duckie")
     # _train(parser.parse_args())
     args = parser.parse_args()
 
     env = launch_env()
+    # env = ResizeWrapper(env)
+    # env = NormalizeWrapper(env)
+    env = ImgWrapper(env)  # to make the images from 160x120x3 into 3x160x120
+    env = ActionWrapper(env)
+    env = DtRewardWrapper(env)
     print("Initialized environment")
 
     # Wrappers
@@ -148,10 +154,16 @@ if __name__ == "__main__":
 
     # Initialize policy
     # model = PPO(MlpPolicy, env, verbose=2)
-    model = PPO.load(f"{args.model_dir}/ppo_duckie")
-    replay_buffer = ReplayBuffer(args.replay_buffer_max_size)
-    print("Initialized PPO Stable Baseline")
-    # Evaluate untrained policy
-    print("ABOUT TO EVALUATE POLICY")
-    mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=1, render=True, warn=True)
-    print(f"mean_reward: {mean_reward:.2f} +/- {std_reward:.2f}")
+    model = PPO.load(f"{args.model_dir}/{args.model_file}")
+    obs, _ = env.reset()
+    while True:
+        action, _states = model.predict(obs)
+        obs, rewards, dones, info, misc = env.step(action)
+        print(rewards)
+        env.render()
+    # replay_buffer = ReplayBuffer(args.replay_buffer_max_size)
+    # print("Initialized PPO Stable Baseline")
+    # # Evaluate untrained policy
+    # print("ABOUT TO EVALUATE POLICY")
+    # mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=1, render=True)
+    # print(f"mean_reward: {mean_reward:.2f} +/- {std_reward:.2f}")

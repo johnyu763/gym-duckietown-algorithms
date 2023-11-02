@@ -101,6 +101,7 @@ logger.setLevel(logging.DEBUG)
 from stable_baselines3.common.base_class import BaseAlgorithm
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.env_checker import check_env
+from utils.wrappers import NormalizeWrapper, ImgWrapper, DtRewardWrapper, ActionWrapper, ResizeWrapper
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -128,9 +129,19 @@ if __name__ == "__main__":
     )  # Maximum number of steps to keep in the replay buffer
     parser.add_argument("--model_dir", type=str, default="reinforcement/pytorch/models/")
     parser.add_argument("--model_file", type=str, default="ppo_duckie")
+    parser.add_argument('--wrap_reward', action='store_true')
+    parser.add_argument('--no-wrap_reward', dest='wrap_reward', action='store_false')
+    parser.set_defaults(wrap_reward=True)
     args = parser.parse_args()
     # Create the vectorized environment
+
     env = launch_env()
+    env = ResizeWrapper(env)
+    env = NormalizeWrapper(env)
+    env = ImgWrapper(env)  # to make the images from 160x120x3 into 3x160x120
+    env = ActionWrapper(env)
+    if(args.wrap_reward):
+      env = DtRewardWrapper(env)
     print("Initialized environment")
 
     # Wrappers
@@ -141,13 +152,8 @@ if __name__ == "__main__":
     # Set seeds
     seed(args.seed)
 
-    # state_dim = env.observation_space.shape
-    # action_dim = env.action_space.shape[0]
-    # max_action = float(env.action_space.high[0])
-
     # Initialize policy
     model = PPO(MlpPolicy, env, verbose=2)
-    # replay_buffer = ReplayBuffer(args.replay_buffer_max_size)
     print("Initialized PPO Stable Baseline")
 
     # Evaluate untrained policy
@@ -155,7 +161,7 @@ if __name__ == "__main__":
     mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=1,warn=True)
     print(f"mean_reward: {mean_reward:.2f} +/- {std_reward:.2f}")
 
-    model.learn(total_timesteps=args.max_timesteps, progress_bar=True)
+    model.learn(total_timesteps=args.max_timesteps)
 
     # obs = vec_env.reset()
     # while True:
