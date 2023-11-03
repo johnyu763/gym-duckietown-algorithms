@@ -2,7 +2,8 @@
 !runTraining.sh
 !src/**
 !experiments/**
-!learning/*.py
+!learning/**
+learning/reinforcement/pytorch/models/**
 !docker/**
 !**/*py
 !**/*yaml

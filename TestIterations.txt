@@ -1,0 +1,11 @@
+# Base Case
+## Just turns in a circle
+
+# Fix use of max speed to current speed
+## Drives slowly in a circle
+
+# Penalty for low speed
+## Drives backwards and crashes without being able to speed
+
+# Change Speed to Velocity
+## Crashes quickly because prolonged negative penalty worse than penalty for crashingß

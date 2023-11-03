@@ -1527,11 +1527,11 @@ class Simulator(gym.Env):
 
         if not res:
             logger.debug(f"Invalid pose. Collision free: {no_collision} On drivable area: {all_drivable}")
-            logger.debug(f"safety_factor: {safety_factor}")
-            logger.debug(f"pos: {pos}")
-            logger.debug(f"l_pos: {l_pos}")
-            logger.debug(f"r_pos: {r_pos}")
-            logger.debug(f"f_pos: {f_pos}")
+            # logger.debug(f"safety_factor: {safety_factor}")
+            # logger.debug(f"pos: {pos}")
+            # logger.debug(f"l_pos: {l_pos}")
+            # logger.debug(f"r_pos: {r_pos}")
+            # logger.debug(f"f_pos: {f_pos}")
 
         return res
 
@@ -1552,6 +1552,7 @@ class Simulator(gym.Env):
 
     def update_physics(self, action, delta_time: float = None):
         # print("updating physics")
+        # print(f"ACTION: {action}")
         if delta_time is None:
             delta_time = self.delta_time
         self.wheelVels = action * self.robot_speed * 1
@@ -1566,8 +1567,12 @@ class Simulator(gym.Env):
 
         # Compute the robot's speed
         delta_pos = self.cur_pos - prev_pos
+        # print(f"DELTA: {delta_pos}")
+        # print(f"CURR: {self.cur_pos} PREV: {prev_pos}")
         self.speed = np.linalg.norm(delta_pos) / delta_time
-
+        if action[0] < 0 and action[1] < 1:
+          self.speed = -self.speed
+        # print(f"DELPOS: {delta_pos} SPEED: {self.speed}")
         # Update world objects
         for obj in self.objects:
             if obj.kind == MapFormat1Constants.KIND_DUCKIEBOT:
@@ -1663,9 +1668,10 @@ class Simulator(gym.Env):
             reward = 40 * col_penalty
         else:
             # Compute the reward
-            # print(f"Speed: {speed} Dot: {lp.dot_dir} Angle: {lp.angle_rad} Lp_Dist: {lp.dist} Col_Penalty: {col_penalty}")
+            # print(f"Speed: {speed}")
+            print(f"Speed: {speed} Dot: {lp.dot_dir} Angle: {lp.angle_rad} Lp_Dist: {lp.dist} Col_Penalty: {col_penalty}")
             # reward = +1.0 * speed * lp.dot_dir + -10 * np.abs(lp.dist) + +40 * col_penalty - 5 * (1 - np.abs(lp.dot_dir))
-            reward = +1.0 * speed * lp.dot_dir + -10 * np.abs(lp.dist) + +40 * col_penalty
+            reward = +1.0 * speed * lp.dot_dir + -10 * np.abs(lp.dist) + +40 * col_penalty + 10 * (speed - 0.2)
         # print(f"reward before: {reward}")
         return reward
 

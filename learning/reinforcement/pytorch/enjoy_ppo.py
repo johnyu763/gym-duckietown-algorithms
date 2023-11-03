@@ -133,8 +133,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     env = launch_env()
-    # env = ResizeWrapper(env)
-    # env = NormalizeWrapper(env)
+    env = ResizeWrapper(env)
+    env = NormalizeWrapper(env)
     env = ImgWrapper(env)  # to make the images from 160x120x3 into 3x160x120
     env = ActionWrapper(env)
     env = DtRewardWrapper(env)
@@ -154,13 +154,26 @@ if __name__ == "__main__":
 
     # Initialize policy
     # model = PPO(MlpPolicy, env, verbose=2)
-    model = PPO.load(f"{args.model_dir}/{args.model_file}")
-    obs, _ = env.reset()
-    while True:
-        action, _states = model.predict(obs)
-        obs, rewards, dones, info, misc = env.step(action)
-        print(rewards)
-        env.render()
+    max_reward = -1
+    max_i = -1
+    max_std = -1
+    for i in range(10, 11):
+      model = PPO.load(f"{args.model_dir}/{args.model_file}{i}")
+      mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=10,warn=True, render=True)
+      print(f"mean_reward: {mean_reward:.2f} +/- {std_reward:.2f}")
+      if(max_i == -1 or max_reward < mean_reward):
+        max_i = i
+        max_reward = mean_reward
+        max_std = std_reward
+    print(f"MY BEST MODEL IS PPODUCK{max_i} mean_reward: {max_reward:.2f} +/- {max_std:.2f}")
+    # obs, _ = env.reset()
+    # while True:
+    #     action, _states = model.predict(obs)
+    #     obs, rewards, dones, info, misc = env.step(action)
+    #     print(rewards)
+    #     if(dones):
+    #       obs, _ = env.reset()
+    #     env.render()
     # replay_buffer = ReplayBuffer(args.replay_buffer_max_size)
     # print("Initialized PPO Stable Baseline")
     # # Evaluate untrained policy

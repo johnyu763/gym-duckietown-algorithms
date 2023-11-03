@@ -17,7 +17,7 @@ def launch_env(id=None):
             accept_start_angle_deg=4,  # start close to straight
             full_transparency=True,
             distortion=True,
-            randomize_maps_on_reset=True,
+            randomize_maps_on_reset=False,
         )
     else:
         env = gym.make(id, render_mode="rgb_array")
