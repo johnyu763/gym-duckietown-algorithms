@@ -95,8 +95,8 @@ class DtRewardWrapper(gym.RewardWrapper):
             reward = -10
         elif reward > 0:
             reward += 10
-        # else:
-        #     reward += 4
+        else:
+            reward -= 0.05
         return reward
 
 

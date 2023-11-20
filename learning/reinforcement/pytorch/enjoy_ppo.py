@@ -157,14 +157,14 @@ if __name__ == "__main__":
     max_reward = -1
     max_i = -1
     max_std = -1
-    for i in range(10, 11):
-      model = PPO.load(f"{args.model_dir}/{args.model_file}{i}")
-      mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=10,warn=True, render=True)
-      print(f"mean_reward: {mean_reward:.2f} +/- {std_reward:.2f}")
-      if(max_i == -1 or max_reward < mean_reward):
-        max_i = i
-        max_reward = mean_reward
-        max_std = std_reward
+    i = 6
+    model = PPO.load(f"{args.model_dir}/{args.model_file}{i}")
+    mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=10,warn=True, render=True)
+    print(f"mean_reward: {mean_reward:.2f} +/- {std_reward:.2f}")
+    if(max_i == -1 or max_reward < mean_reward):
+      max_i = i
+      max_reward = mean_reward
+      max_std = std_reward
     print(f"MY BEST MODEL IS PPODUCK{max_i} mean_reward: {max_reward:.2f} +/- {max_std:.2f}")
     # obs, _ = env.reset()
     # while True:

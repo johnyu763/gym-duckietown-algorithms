@@ -1,11 +1,74 @@
 # Base Case
 ## Just turns in a circle
+reward = +1.0 * speed * lp.dot_dir + -10 * np.abs(lp.dist) + +40 * col_penalty
 
 # Fix use of max speed to current speed
 ## Drives slowly in a circle
 
 # Penalty for low speed
 ## Drives backwards and crashes without being able to speed
+reward = +1.0 * speed * lp.dot_dir + -10 * np.abs(lp.dist) + +40 * col_penalty + 10 * (speed - 0.2)
 
 # Change Speed to Velocity
-## Crashes quickly because prolonged negative penalty worse than penalty for crashingß
+## Crashes quickly because prolonged negative penalty worse than penalty for crashing
+
+# Prioritize Distance From Center of Lane
+# Remove col_penalty
+Turns slightly right constantly for no reason
+reward = +3.0 * speed + -8 * np.abs(lp.dist) 
+wrapper -> reward += 2
+ppoduck1
+
+# Basic Reward Minus col_penalty
+Very slow, turns slightly left constantly for no reason
+reward = +3.0 * speed * lp.dot_dir + -8 * np.abs(lp.dist)
+wrapper -> reward += 2
+ppoduck2
+
+# Col Penalty is Sole Penalty
+Spins in circles extremely fast, very little forward movement
+reward = +3.0 * speed * lp.dot_dir + 2 * col_penalty 
+wrapper -> reward -= 0.05 to penalize doing nothing
+ppoduck3
+
+# Speed and Direction Only Approach
+Turns left very quickly and crashes
+Maybe incentivized to crash because reward is negative
+reward = speed * lp.dot_dir + (speed-0.2)
+wrapper -> None for < 0
+ppoduck4
+
+# Basic Reward Minus col_penalty + Speed Penalty
+Very slow, turns slightly left constantly for no reason
+speed_penalty = 0
+if(speed < 0.2):
+  speed_penalty = -0.2
+reward = +3.0 * speed * lp.dot_dir + -8 * np.abs(lp.dist) + speed_penalty
+wrapper -> reward += 2
+ppoduck5
+
+# Col Penalty is Sole Penalty + Angle Penalty
+Record delta_angle
+It turns left and crashes, just less fast turning
+Improvements: More forward movement
+Possible Changes: instead of raw delta angle, penalize for turning the wrong way
+reward = +3.0 * speed * lp.dot_dir + 2 * col_penalty - 5 * np.abs(self.delta_angle)
+wrapper -> reward -= 0.05 to penalize doing nothing
+ppoduck6
+
+# Speed and Direction Only Approach + Wrap Non-Negative
+Turns left very quickly and crashes
+Maybe incentivized to crash because reward is negative
+speed_penalty = 0
+if(speed < 0.2):
+  speed_penalty = -0.2
+reward = speed * lp.dot_dir + speed_penalty
+wrapper -> reward += 1
+ppoduck7
+
+# Col Penalty With Penalty For Turning Wrong Way
+ppoduck6 with delta with respect to correct turning
+delta_dot = np.abs(self.dot_dir) - np.abs(prev_dot_dir)
+reward = +3.0 * speed * lp.dot_dir + 2 * col_penalty + 1000 * delta_dot
+wrapper -> reward -= 0.05
+ppoduck8
