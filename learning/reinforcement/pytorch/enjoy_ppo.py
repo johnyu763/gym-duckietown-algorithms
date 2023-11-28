@@ -157,7 +157,7 @@ if __name__ == "__main__":
     max_reward = -1
     max_i = -1
     max_std = -1
-    i = 11
+    i = 17
     model = PPO.load(f"{args.model_dir}/{args.model_file}{i}")
     mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=10,warn=True, render=True)
     print(f"mean_reward: {mean_reward:.2f} +/- {std_reward:.2f}")

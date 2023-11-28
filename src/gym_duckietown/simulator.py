@@ -1698,10 +1698,10 @@ class Simulator(gym.Env):
             if(speed < 0.2):
               speed_penalty = -0.2
             elif(speed > 0.2):
-              speed_penalty = speed - 0.2
+              speed_penalty = speed
             turn_penalty = np.abs(self.last_action[0]-self.last_action[1])
             # print(f"TURN PENAL: {turn_penalty} col_penal: {2 * col_penalty} delta_dot: {500 * delta_dot}")
-            reward = 1.5 - (lp.dist**2 * 200) + 8 * speed
+            reward = 2.0 + 500 * delta_dot + 8 * speed_penalty - (lp.dist**2 * 200)
 
         # print(f"reward before: {reward}")
         return reward

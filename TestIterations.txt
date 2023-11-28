@@ -267,15 +267,6 @@ elif(speed > 0.2):
 reward = 2.0 + 250 * delta_dot + 8 * speed_penalty
 ppoduck28
 
-# Smaller Delta Angle + Greater Speed
-speed_penalty = 0
-if(speed < 0.3):
-  speed_penalty = -0.3
-elif(speed > 0.3):
-  speed_penalty = speed
-reward = 2.0 + 250 * delta_dot + 8 * speed_penalty
-ppoduck29
-
 # Altered Delta Dot
 delta_dot = self.dot_dir - prev_dot_dir
 speed_penalty = 0
@@ -284,6 +275,16 @@ if(speed < 0.2):
 elif(speed > 0.2):
   speed_penalty = speed - 0.2
 reward = 2.0 + 500 * delta_dot + 8 * speed_penalty
+ppoduck29
+
+# Smaller Delta Angle + Greater Speed
+speed_penalty = 0
+if(speed < 0.3):
+  speed_penalty = -0.3
+elif(speed > 0.3):
+  speed_penalty = speed
+reward = 2.0 + 250 * delta_dot + 8 * speed_penalty
+ppoduck30
 
 # Accumulate Delta
 if(delta_dot * self.acc_dot < 0):
@@ -291,14 +292,26 @@ if(delta_dot * self.acc_dot < 0):
 else:
   self.acc_dot += delta_dot
 reward = 2.0 + self.acc_dot + 8 * speed_penalty
+ppoduck31
 
 # Square Distance
 reward = 1.5 - (lp.dist**2 * 200)
+ppoduck32
 
 # Square Distance + Speed
+speed_penalty = 0
+if(speed < 0.3):
+  speed_penalty = -0.3
+elif(speed > 0.3):
+  speed_penalty = speed - 0.3
+reward = 1.5 - (lp.dist**2 * 200) + 8 * speed
+ppoduck33
+
+# Delta + Square Distance
 speed_penalty = 0
 if(speed < 0.2):
   speed_penalty = -0.2
 elif(speed > 0.2):
-  speed_penalty = speed - 0.2
-reward = 1.5 - (lp.dist**2 * 200) + 8 * speed
+  speed_penalty = speed
+reward = 2.0 + 500 * delta_dot + 8 * speed_penalty - (lp.dist**2 * 200)
+ppoduck34
