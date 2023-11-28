@@ -382,7 +382,6 @@ class Simulator(gym.Env):
         # Initialize the state
         self.reset()
 
-        self.last_action = np.array([0, 0])
         self.wheelVels = np.array([0, 0])
 
     def _init_vlists(self):
@@ -536,11 +535,14 @@ class Simulator(gym.Env):
         # Step count since episode start
         self.step_count = 0
         self.timestamp = 0.0
+        self.last_action = np.array([0, 0])
+        self.last_dist = None
 
         # Robot's current speed
         self.speed = 0.0
         self.delta_angle = 0.0
         self.dot_dir = 0.0
+        self.acc_dot = 0.0
 
         if self.randomize_maps_on_reset:
             map_name = self.np_random.choice(self.map_names)
@@ -1566,7 +1568,6 @@ class Simulator(gym.Env):
         self.timestamp += delta_time
 
         self.last_action = action
-
         # Compute the robot's speed
         delta_pos = self.cur_pos - prev_pos
         self.delta_angle = self.cur_angle - prev_angle
@@ -1666,26 +1667,48 @@ class Simulator(gym.Env):
     def get_reward(self, pos, angle, speed):
         # Compute the collision avoidance penalty
         col_penalty = self.proximity_penalty2(pos, angle)
+
         # Get the position relative to the right lane tangent
         try:
             lp = self.get_lane_pos2(pos, angle)
+            # if(self.last_dist != None and self.last_dist > -0.05 and lp.dist < -0.05):
+            #   raise NotInLane
+            self.last_dist = lp.dist
         except NotInLane:
+            # print(f"Speed: {speed} Dot: {lp.dot_dir} Angle: {lp.angle_rad} Lp_Dist: {lp.dist} Col_Penalty: {col_penalty}")
             reward = 40 * col_penalty
         else:
             prev_dot_dir = self.dot_dir
             self.dot_dir = lp.dot_dir
+            # print("dot diff", self.dot_dir - prev_dot_dir)
             delta_dot = np.abs(self.dot_dir) - np.abs(prev_dot_dir)
+            if(delta_dot * self.acc_dot < 0):
+              self.acc_dot = delta_dot
+            else:
+              self.acc_dot += delta_dot
             # Compute the reward
             # print(f"Speed: {speed}")
-            print(f"Speed: {speed} Dot: {lp.dot_dir} Angle: {lp.angle_rad} Lp_Dist: {lp.dist} Col_Penalty: {col_penalty}")
+            # print(f"Speed: {speed} Dot: {lp.dot_dir} Angle: {lp.angle_rad} Lp_Dist: {lp.dist} Col_Penalty: {col_penalty}")
             # reward = +1.0 * speed * lp.dot_dir + -10 * np.abs(lp.dist) + +40 * col_penalty - 5 * (1 - np.abs(lp.dot_dir))
-            print(f"delta_dot: {delta_dot}")
-            reward = +3.0 * speed * lp.dot_dir + 2 * col_penalty + 1000 * delta_dot
-        print(f"reward before: {reward}")
+            # print(f"delta_dot: {delta_dot}")
+            # print(f"DIST: {lp.dist**2 * 200} Speed: {speed}")
+            sign = -1 if lp.dist < 0 else 1
+            
+            speed_penalty = 0
+            if(speed < 0.2):
+              speed_penalty = -0.2
+            elif(speed > 0.2):
+              speed_penalty = speed - 0.2
+            turn_penalty = np.abs(self.last_action[0]-self.last_action[1])
+            # print(f"TURN PENAL: {turn_penalty} col_penal: {2 * col_penalty} delta_dot: {500 * delta_dot}")
+            reward = 1.5 - (lp.dist**2 * 200) + 8 * speed
+
+        # print(f"reward before: {reward}")
         return reward
 
     def step(self, action: np.ndarray):
         action = np.clip(action, -1, 1)
+        # print(action)
         # Actions could be a Python list
         action = np.array(action)
         for _ in range(self.frame_skip):

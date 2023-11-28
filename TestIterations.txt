@@ -40,6 +40,7 @@ ppoduck4
 
 # Basic Reward Minus col_penalty + Speed Penalty
 Very slow, turns slightly left constantly for no reason
+Turns left, but faster now
 speed_penalty = 0
 if(speed < 0.2):
   speed_penalty = -0.2
@@ -57,8 +58,7 @@ wrapper -> reward -= 0.05 to penalize doing nothing
 ppoduck6
 
 # Speed and Direction Only Approach + Wrap Non-Negative
-Turns left very quickly and crashes
-Maybe incentivized to crash because reward is negative
+Spins quickly in a circle
 speed_penalty = 0
 if(speed < 0.2):
   speed_penalty = -0.2
@@ -68,7 +68,237 @@ ppoduck7
 
 # Col Penalty With Penalty For Turning Wrong Way
 ppoduck6 with delta with respect to correct turning
+Turns right slightly with a little forward movement
 delta_dot = np.abs(self.dot_dir) - np.abs(prev_dot_dir)
 reward = +3.0 * speed * lp.dot_dir + 2 * col_penalty + 1000 * delta_dot
 wrapper -> reward -= 0.05
 ppoduck8
+
+# Put Penalty Types Together
+Delta dot + speed + dist
+Really slow movement, probably would crash given enough time
+Increase crash penalty to 50
+speed_penalty = 0
+if(speed < 0.2):
+  speed_penalty = -0.2
+reward = +1.0 * speed * lp.dot_dir + -10 * np.abs(lp.dist) + +2 * col_penalty + 1000 * delta_dot + speed_penalty
+wrapper -> reward += 1
+ppoduck9
+
+# Even simpler baseline
+distance only
+Doesn't go forward
+reward = 1.5 - 8.0 * np.abs(lp.dist) 
+ppoduck10
+
+# Even simpler baseline + speed
+distance and speed
+Tends to just spin in a circle moderately quickly
+speed_penalty = 0
+if(speed < 0.2):
+  speed_penalty = -0.2
+elif(speed > 0.2):
+  speed_penalty = speed - 0.2
+reward = 3.0 - 8.0 * np.abs(lp.dist) + 8.0 * speed_penalty
+no reward wrapper except crash
+ppoduck11
+
+# Angle only
+Just spins slowly
+sign = -1 if lp.dist < 0 else 1
+reward = 3 + sign * +3.0 * lp.dot_dir
+ppoduck12
+
+# Angle + speed
+Just spins moderately fast
+sign = -1 if lp.dist < 0 else 1
+speed_penalty = 0
+if(speed < 0.2):
+  speed_penalty = -0.2
+elif(speed > 0.2):
+  speed_penalty = speed - 0.2
+reward = 3 + sign * +3.0 * lp.dot_dir + 8 * speed_penalty
+ppoduck13
+
+# Angle and Distance
+This just spins
+sign = -1 if lp.dist < 0 else 1
+reward = 3 + sign * +3.0 * lp.dot_dir + -8 * np.abs(lp.dist)
+ppoduck14
+
+# Angle and Distance + Speed
+Slow spinning
+speed_penalty = 0
+if(speed < 0.2):
+  speed_penalty = -0.2
+elif(speed > 0.2):
+  speed_penalty = speed - 0.2
+reward = 3 + +3.0 * lp.dot_dir + -8 * np.abs(lp.dist) + speed_penalty
+ppoduck15
+
+# Delta Angle Only
+Spinning and sometimes crashing
+reward = 1.0 + 500 * delta_dot
+ppoduck16
+
+# Delta Angle + Speed
+This is the only one that goes forward
+So next move would be to force it to go faster or penalize turning
+speed_penalty = 0
+if(speed < 0.2):
+  speed_penalty = -0.2
+elif(speed > 0.2):
+  speed_penalty = speed - 0.2
+reward = 2.0 + 500 * delta_dot + 8 * speed_penalty
+ppoduck17
+
+# Delta Angle + Greater Speed
+Got slower, should reduce the baseline value to penalize slow
+speed_penalty = 0
+if(speed < 0.3):
+  speed_penalty = -0.3
+elif(speed > 0.3):
+  speed_penalty = speed - 0.3
+reward = 3.0 + 500 * delta_dot + 8 * speed_penalty
+ppoduck18
+
+# Delta Angle + Penalize turning
+Driving backwards
+speed_penalty = 0
+if(speed < 0.2):
+  speed_penalty = -0.2
+elif(speed > 0.2):
+  speed_penalty = speed - 0.2
+turn_penalty = np.abs(self.last_action[0]-self.last_action[1])
+reward = 3.0 + 500 * delta_dot + 8 * speed_penalty - 5 * turn_penalty
+ppoduck19
+
+# Delta Angle + Penalize distance
+Spinning
+speed_penalty = 0
+if(speed < 0.2):
+  speed_penalty = -0.2
+elif(speed > 0.2):
+  speed_penalty = speed - 0.2
+reward = 3.0 + 500 * delta_dot + 8 * speed_penalty - 20 * np.abs(lp.dist)
+ppoduck20
+
+# Delta Angle + Penalize Turning and Speed
+Spinning
+speed_penalty = 0
+if(speed < 0.3):
+  speed_penalty = -0.3
+elif(speed > 0.3):
+  speed_penalty = speed - 0.3
+turn_penalty = np.abs(self.last_action[0]-self.last_action[1])
+reward = 3.0 + 500 * delta_dot + 8 * speed_penalty - 5 * turn_penalty
+ppoduck21
+
+# Delta Angle + Penalize Turning and Distance
+Spinning
+speed_penalty = 0
+if(speed < 0.2):
+  speed_penalty = -0.2
+elif(speed > 0.2):
+  speed_penalty = speed - 0.2
+turn_penalty = np.abs(self.last_action[0]-self.last_action[1])
+reward = 3.0 + 500 * delta_dot + 8 * speed_penalty - 5 * turn_penalty - 20 * np.abs(lp.dist)
+ppoduck22
+
+# Delta Angle + Penalize Speed and Distance
+Spinning
+speed_penalty = 0
+if(speed < 0.3):
+  speed_penalty = -0.3
+elif(speed > 0.3):
+  speed_penalty = speed - 0.3
+reward = 3.5 + 500 * delta_dot + 8 * speed_penalty - 20 * np.abs(lp.dist)
+ppoduck23
+
+# Delta Angle + Penalize All
+Sideways movement/spinning
+speed_penalty = 0
+if(speed < 0.3):
+  speed_penalty = -0.3
+elif(speed > 0.3):
+  speed_penalty = speed - 0.3
+turn_penalty = np.abs(self.last_action[0]-self.last_action[1])
+reward = 4.0 + 500 * delta_dot + 8 * speed_penalty - 5 * turn_penalty - 20 * np.abs(lp.dist)
+ppoduck24
+
+# Delta Angle + Greater Speed 2
+Spinning
+speed_penalty = 0
+if(speed < 0.3):
+  speed_penalty = -0.3
+elif(speed > 0.3):
+  speed_penalty = speed - 0.3
+reward = 2.0 + 500 * delta_dot + 8 * speed_penalty
+ppoduck25
+
+# Greater Speed 2 + Crossing Penalty
+lp = self.get_lane_pos2(pos, angle)
+if(self.last_dist != None and self.last_dist > -0.05 and lp.dist < -0.05):
+  raise NotInLane
+self.last_dist = lp.dist
+speed_penalty = 0
+if(speed < 0.3):
+  speed_penalty = -0.3
+elif(speed > 0.3):
+  speed_penalty = speed - 0.3
+reward = 2.0 + 500 * delta_dot + 8 * speed_penalty
+ppoduck26
+
+# Delta Angle + Collision
+speed_penalty = 0
+if(speed < 0.2):
+  speed_penalty = -0.2
+elif(speed > 0.2):
+  speed_penalty = speed - 0.2
+reward = 2.0 + 500 * delta_dot + 8 * speed_penalty + 2 * col_penalty 
+ppoduck27
+
+# Smaller Delta Angle
+speed_penalty = 0
+if(speed < 0.2):
+  speed_penalty = -0.2
+elif(speed > 0.2):
+  speed_penalty = speed - 0.2
+reward = 2.0 + 250 * delta_dot + 8 * speed_penalty
+ppoduck28
+
+# Smaller Delta Angle + Greater Speed
+speed_penalty = 0
+if(speed < 0.3):
+  speed_penalty = -0.3
+elif(speed > 0.3):
+  speed_penalty = speed
+reward = 2.0 + 250 * delta_dot + 8 * speed_penalty
+ppoduck29
+
+# Altered Delta Dot
+delta_dot = self.dot_dir - prev_dot_dir
+speed_penalty = 0
+if(speed < 0.2):
+  speed_penalty = -0.2
+elif(speed > 0.2):
+  speed_penalty = speed - 0.2
+reward = 2.0 + 500 * delta_dot + 8 * speed_penalty
+
+# Accumulate Delta
+if(delta_dot * self.acc_dot < 0):
+  self.acc_dot = delta_dot
+else:
+  self.acc_dot += delta_dot
+reward = 2.0 + self.acc_dot + 8 * speed_penalty
+
+# Square Distance
+reward = 1.5 - (lp.dist**2 * 200)
+
+# Square Distance + Speed
+speed_penalty = 0
+if(speed < 0.2):
+  speed_penalty = -0.2
+elif(speed > 0.2):
+  speed_penalty = speed - 0.2
+reward = 1.5 - (lp.dist**2 * 200) + 8 * speed
