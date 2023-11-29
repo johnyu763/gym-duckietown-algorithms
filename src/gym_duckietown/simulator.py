@@ -1696,14 +1696,17 @@ class Simulator(gym.Env):
             
             speed_penalty = 0
             if(speed < 0.2):
-              speed_penalty = -0.2
+              speed_penalty = -1
             elif(speed > 0.2):
-              speed_penalty = speed
+              speed_penalty = speed * 10
             turn_penalty = np.abs(self.last_action[0]-self.last_action[1])
+            print(lp.dist)
+            print("SPEED:", speed)
             # print(f"TURN PENAL: {turn_penalty} col_penal: {2 * col_penalty} delta_dot: {500 * delta_dot}")
-            reward = 2.0 + 500 * delta_dot + 8 * speed_penalty - (lp.dist**2 * 200)
+            reward = 500 * delta_dot + speed_penalty - (lp.dist**2 * 50)
 
-        # print(f"reward before: {reward}")
+
+        print(f"reward before: {reward}")
         return reward
 
     def step(self, action: np.ndarray):
@@ -1721,6 +1724,7 @@ class Simulator(gym.Env):
         d = self._compute_done_reward()
         misc["Simulator"]["msg"] = d.done_why
         # print(f"Step Count: {self.step_count} Reward: {d.reward}")
+        # print(f"OBSERVATION: {obs}")
         return obs, d.reward, d.done, False, misc
 
     def _compute_done_reward(self) -> DoneRewardInfo:

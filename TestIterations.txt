@@ -250,6 +250,7 @@ reward = 2.0 + 500 * delta_dot + 8 * speed_penalty
 ppoduck26
 
 # Delta Angle + Collision
+Spinning
 speed_penalty = 0
 if(speed < 0.2):
   speed_penalty = -0.2
@@ -259,6 +260,7 @@ reward = 2.0 + 500 * delta_dot + 8 * speed_penalty + 2 * col_penalty
 ppoduck27
 
 # Smaller Delta Angle
+spinning
 speed_penalty = 0
 if(speed < 0.2):
   speed_penalty = -0.2
@@ -268,6 +270,7 @@ reward = 2.0 + 250 * delta_dot + 8 * speed_penalty
 ppoduck28
 
 # Altered Delta Dot
+Kinda just spinning
 delta_dot = self.dot_dir - prev_dot_dir
 speed_penalty = 0
 if(speed < 0.2):
@@ -278,6 +281,7 @@ reward = 2.0 + 500 * delta_dot + 8 * speed_penalty
 ppoduck29
 
 # Smaller Delta Angle + Greater Speed
+Spinning
 speed_penalty = 0
 if(speed < 0.3):
   speed_penalty = -0.3
@@ -287,6 +291,7 @@ reward = 2.0 + 250 * delta_dot + 8 * speed_penalty
 ppoduck30
 
 # Accumulate Delta
+Spinning really fast
 if(delta_dot * self.acc_dot < 0):
   self.acc_dot = delta_dot
 else:
@@ -295,10 +300,12 @@ reward = 2.0 + self.acc_dot + 8 * speed_penalty
 ppoduck31
 
 # Square Distance
+Spinning in place
 reward = 1.5 - (lp.dist**2 * 200)
 ppoduck32
 
 # Square Distance + Speed
+Spinning Really Fast
 speed_penalty = 0
 if(speed < 0.3):
   speed_penalty = -0.3
@@ -308,6 +315,7 @@ reward = 1.5 - (lp.dist**2 * 200) + 8 * speed
 ppoduck33
 
 # Delta + Square Distance
+Spinning
 speed_penalty = 0
 if(speed < 0.2):
   speed_penalty = -0.2
@@ -315,3 +323,88 @@ elif(speed > 0.2):
   speed_penalty = speed
 reward = 2.0 + 500 * delta_dot + 8 * speed_penalty - (lp.dist**2 * 200)
 ppoduck34
+
+# Retrain Delta Angle + Speed
+Both go backward slowly
+So next move would be to force it to go faster or penalize turning
+speed_penalty = 0
+if(speed < 0.2):
+  speed_penalty = -0.2
+elif(speed > 0.2):
+  speed_penalty = speed - 0.2
+reward = 2.0 + 500 * delta_dot + 8 * speed_penalty
+With indent
+ppoduck172
+
+# Retrain Delta Angle + Speed
+This is the only one that goes forward
+So next move would be to force it to go faster or penalize turning
+speed_penalty = 0
+if(speed < 0.2):
+  speed_penalty = -0.2
+elif(speed > 0.2):
+  speed_penalty = speed - 0.2
+reward = 2.0 + 500 * delta_dot + 8 * speed_penalty
+Without indent
+ppoduck173
+
+# Retrain with Wrapper Changes
+very slow
+reward = 500 * delta_dot + 8 * speed_penalty
+if(reward > 0):
+  reward += 10
+else:
+  reward += 2
+ppoduck35
+
+# Wrapper Change Dist
+spins
+if(reward > 0):
+  reward += 10
+else:
+  reward += 2
+reward = 500 * delta_dot + 8 * speed_penalty - (lp.dist**2 * 100)
+ppoduck36
+
+# Retrain with wrapper dist square + speed
+Very slowly crashing
+speed_penalty = 0
+if(speed < 0.3):
+  speed_penalty = -0.3
+elif(speed > 0.3):
+  speed_penalty = speed - 0.3
+reward = -(lp.dist**2 * 100) + 8 * speed_penalty
+ppoduck37
+
+# Insanity is trying the same thing
+speed_penalty = 0
+if(speed < 0.2):
+  speed_penalty = -1
+elif(speed > 0.2):
+  speed_penalty = speed * 10
+reward = 500 * delta_dot + speed_penalty - (lp.dist**2 * 50)
+total_timestamps = 10000, 25000, 50000, 75000
+ppoduck38-41
+
+# Insanity is trying the same thing 2
+speed_penalty = 0
+if(speed < 0.2):
+  speed_penalty = -1
+elif(speed > 0.2):
+  speed_penalty = speed * 10
+reward = 500 * delta_dot + speed_penalty
+total_timestamps = 10000, 25000, 50000, 75000
+ppoduck42-45
+
+# Insanity is trying the same thing 3
+speed_penalty = 0
+if(speed < 0.2):
+  speed_penalty = -1
+elif(speed > 0.2):
+  speed_penalty = speed * 10
+reward = -(lp.dist**2 * 100) + speed_penalty
+total_timestamps = 10000, 25000, 50000, 75000
+ppoduck46-49
+
+# Remove Crash Penalty
+ppoduck50
